@@ -4,19 +4,13 @@ import SignupImg from "../assets/signupimg.png";
 import { FcGoogle } from "react-icons/fc";
 import { Navigate, NavLink, useNavigate } from "react-router";
 import { useState } from "react";
-import {
-	getAuth,
-	createUserWithEmailAndPassword,
-	updateProfile,
-	sendEmailVerification,
-} from "firebase/auth";
-import { useEffect } from "react";
+
 import axios from "axios";
 
 const SignUp = () => {
 	const [formData, setFormData] = useState({
 		name: "",
-		emailORmobile: "",
+		email: "",
 		password: "",
 	});
 
@@ -33,9 +27,8 @@ const SignUp = () => {
 				`${import.meta.env.VITE_AUTH_URL}/register`,
 				{
 					name: formData.name,
-					email: formData.emailORmobile,
-					password: formData.password,
-					firstName: "AMI",
+					email: formData.email,
+					password: formData.password
 				},
 			);
 			console.log(response);
@@ -86,9 +79,9 @@ const SignUp = () => {
 						<div className="mt-10  ">
 							<input
 								type="text"
-								name="emailORmobile"
-								value={formData.emailORmobile}
-								placeholder="Email or Phone Number"
+								name="email"
+								value={formData.email}
+								placeholder="Email"
 								className="border-b-2 border-secondary w-92.5 h-8 py-2 focus:outline-none"
 								onChange={handleChange}
 							/>

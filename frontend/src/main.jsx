@@ -1,11 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import './index.css';
+import "./index.css";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import RootLayout from "./RootLayout";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -23,7 +20,8 @@ import Error from "./pages/Error";
 import Wishlist from "./pages/Wishlist";
 import { ToastContainer } from "react-toastify";
 import firebaseConfig from "../src/FirebaseConfig.js";
-
+import Emailvarification from "./pages/Emailvarification.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +33,9 @@ const router = createBrowserRouter([
       { path: "shop", Component: Shop },
       { path: "contact", Component: Contact },
       { path: "signup", Component: SignUp },
+      { path: "/:token", Component: Emailvarification },
       { path: "login", Component: Login },
+      { path: "forgot-password", Component: ForgotPassword },
       { path: "productdetails/:id", Component: ProductDetails },
       { path: "attocart", Component: AtToCart },
       { path: "account", Component: Account },
@@ -46,13 +46,11 @@ const router = createBrowserRouter([
   },
 ]);
 
-
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ToastContainer/>
+    <ToastContainer />
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
   </StrictMode>,
-
 );

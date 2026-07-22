@@ -2,262 +2,249 @@ const UserModel = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendEmail, sendForgotEmail } = require("../utils/sendEmail");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const registrationController = async (req, res) => {
-	const { name, email, mobile_number, password } = req.body;
+  const { name, email, password } = req.body;
 
-	if (!name || !email || !password) {
-		return res.status(400).json({
-			success: false,
-			message: "All fields are required fdffdfdsafee",
-		});
-	}
-	// if (!mobile_number || !email) {
-	// 	return res.status(400).json({
-	// 		success: false,
-	// 		message: "All fields are required",
-	// 	});
-	// }
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "All fields are required",
+    });
+  }
+  const isUserExist = await UserModel.findOne({ email });
+  if (isUserExist) {
+    return res.json({
+      success: false,
+      message: "User Already exist",
+    });
+  }
 
-	// if (password !== confirmPassword) {
-	// 	return res.status(400).json({
-	// 		success: false,
-	// 		message: "Passwords do not match",
-	// 	});
-	// }
+  // hash password create
+  const hashPassword = bcrypt.hashSync(password, 10);
 
-	const isUserExist = await UserModel.findOne({ email });
-	if (isUserExist) {
-		return res.json({
-			success: false,
-			message: "User Already exist",
-		});
-	}
+  const newUser = await UserModel.create({
+    name,
+    email,
+    password: hashPassword,
+  });
 
-	// hash password create
-	const hashPassword = bcrypt.hashSync(password, 10);
+  const token = jwt.sign(
+    { id: newUser._id, email: newUser.email },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" },
+  );
 
-	const newUser = await UserModel.create({
-		firstName,
-		email,
-		password: hashPassword,
-		acceptTerms,
-	});
+  // send verification email
+  sendEmail(email, "alamin", token);
 
-	const token = jwt.sign(
-		{ id: newUser._id, email: newUser.email },
-		process.env.JWT_SECRET,
-		{ expiresIn: "1d" },
-	);
-
-	// send verification email
-	sendEmail(email, "dada", token);
-
-	res.json({
-		success: true,
-		message: "User registration successfull",
-		data: {
-			email: newUser.email,
-			acceptTerms: newUser.acceptTerms,
-			role: newUser.role,
-		},
-	});
+  res.json({
+    success: true,
+    message: "User registration successfull",
+    data: {
+      email: newUser.email,
+    },
+  });
 };
 
 const verifyController = async (req, res) => {
-	const { token } = req.params;
+  const { token } = req.params;
 
-	// token check
-	jwt.verify(token, process.env.JWT_SECRET, async function (err, decoded) {
-		// err
-		if (err) {
-			return res.json({
-				success: false,
-				message: "invalid token",
-			});
-		}
-		// decoded token
-		const userId = decoded.id;
-		console.log("USER ID ", userId);
+  // token check
+  jwt.verify(token, process.env.JWT_SECRET, async function (err, decoded) {
+    // err
+    if (err) {
+      return res.json({
+        success: false,
+        message: "invalid token",
+      });
+    }
+    // decoded token
+    const userId = decoded.id;
+    console.log("USER ID ", userId);
 
-		const hasUser = await UserModel.findOne({ _id: userId });
-		console.log(hasUser);
+    const hasUser = await UserModel.findOne({ _id: userId });
+    console.log(hasUser);
 
-		if (!hasUser) {
-			return res.json({
-				success: false,
-				message: "User not found",
-			});
-		}
-		hasUser.isVerified = true;
-		hasUser.save();
-	});
+    if (!hasUser) {
+      return res.json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    hasUser.isVerified = true;
+    hasUser.save();
+  });
 
-	res.json({
-		success: true,
-		message: "email varification successfull",
-	});
+  res.json({
+    success: true,
+    message: "email varification successfull",
+  });
 };
 const loginController = async (req, res) => {
-	const { email, password } = req.body;
+  const { email, password } = req.body;
 
-	const isUserExist = await UserModel.findOne({ email });
+  const isUserExist = await UserModel.findOne({ email });
 
-	if (!isUserExist) {
-		return res.json({
-			success: false,
-			message: "User Not Found!",
-		});
-	}
+  if (!isUserExist) {
+    return res.json({
+      success: false,
+      message: "User Not Found!",
+    });
+  }
 
-	// Password match
-	const matchPassword = bcrypt.compareSync(password, isUserExist.password);
+  // Password match
+  const matchPassword = bcrypt.compareSync(password, isUserExist.password);
 
-	if (!matchPassword) {
-		return res.json({
-			success: false,
-			message: "Credential error",
-		});
-	}
+  if (!matchPassword) {
+    return res.json({
+      success: false,
+      message: "Credential error",
+    });
+  }
 
-	const token = jwt.sign(
-		{ id: isUserExist._id, email: isUserExist.email, role: isUserExist.role },
-		process.env.ACCESS_TOKEN,
-		{ expiresIn: "7d" },
-	);
+  const token = jwt.sign(
+    { id: isUserExist._id, email: isUserExist.email, role: isUserExist.role },
+    process.env.ACCESS_TOKEN,
+    { expiresIn: "7d" },
+  );
 
-	res.json({
-		success: true,
-		message: "Successfully Login",
-		accesstoken: token,
-	});
+  res.json({
+    success: true,
+    message: "Successfully Login",
+    accesstoken: token,
+  });
 };
 const forgotPasswordController = async (req, res) => {
-	const { email } = req.body;
+  const { email } = req.body;
 
-	const isUserExist = await UserModel.findOne({ email });
+  const isUserExist = await UserModel.findOne({ email });
 
-	if (!isUserExist) {
-		return res.json({
-			success: false,
-			message: "User Not Found!",
-		});
-	}
+  if (!isUserExist) {
+    return res.json({
+      success: false,
+      message: "User Not Found!",
+    });
+  }
 
-	try {
-		const token = jwt.sign(
-			{ id: isUserExist._id, email: isUserExist.email, role: isUserExist.role },
-			process.env.AccessToken,
-			{ expiresIn: "10m" },
-		);
+  try {
+    console.log(process.env.ACCESS_TOKEN);
+    const token = jwt.sign(
+      { id: isUserExist._id, email: isUserExist.email, role: isUserExist.role },
+      process.env.ACCESS_TOKEN,
+      { expiresIn: "10m" },
+    );
+    console.log(token);
 
-		sendForgotEmail(email, "Al-amin", token);
+    sendForgotEmail(email, "Al-amin", token);
 
-		res.json({
-			success: true,
-			message: "Check your email and set the new password",
-		});
-	} catch (error) {
-		console.log("Server Error", error);
-		res.status(500).json({
-			success: false,
-			message: error.message,
-		});
-	}
+    res.json({
+      success: true,
+      message: "Check your email and set the new password",
+    });
+  } catch (error) {
+    console.log("Server Error", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 const setNewPasswordController = async (req, res) => {
-	const { newPassword, confirmPassword } = req.body;
-	const { token } = req.params;
+  const { newPassword, confirmPassword } = req.body;
+  const { token } = req.params;
 
-	if (newPassword !== confirmPassword) {
-		return res.status(401).json({
-			success: false,
-			message: "Passwords do not match",
-		});
-	}
+  if (newPassword !== confirmPassword) {
+    return res.status(401).json({
+      success: false,
+      message: "Passwords do not match",
+    });
+  }
 
-	if (!token) {
-		return res.json({
-			success: false,
-			message: "Token Not Found!",
-		});
-	}
+  if (!token) {
+    return res.json({
+      success: false,
+      message: "Token Not Found!",
+    });
+  }
 
-	try {
-		const decode = jwt.decode(token, process.env.AccessToken);
-		console.log("DECODE", decode);
-		const user = await UserModel.findById(decode.id);
-		console.log(user);
+  try {
+    const decode = jwt.decode(token, process.env.AccessToken);
+    console.log("DECODE", decode);
+    const user = await UserModel.findById(decode.id);
+    console.log(user);
 
-		// Generate hashpassword
-		const hashpassword = bcrypt.hashSync(newPassword, 10);
-		user.password = hashpassword;
-		await user.save();
+    // Generate hashpassword
+    const hashpassword = bcrypt.hashSync(newPassword, 10);
+    user.password = hashpassword;
+    await user.save();
 
-		res.json({
-			success: true,
-			message: "Successfully change the password",
-		});
-	} catch (error) {
-		console.log("Server Error", error);
-		res.status(500).json({
-			success: false,
-			message: error.message,
-		});
-	}
+    res.json({
+      success: true,
+      message: "Successfully change the password",
+    });
+  } catch (error) {
+    console.log("Server Error", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 const revarificationController = async (req, res) => {
-	const { email } = req.body;
-	if (!email) {
-		return res.status(400).json({
-			success: false,
-			message: "Email is required",
-		});
-	}
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "Email is required",
+    });
+  }
 
-	try {
-		const isUserExist = await UserModel.findOne({ email });
-		if (!isUserExist) {
-			return res.json({
-				success: false,
-				message: "User not found!",
-			});
-		}
+  try {
+    const isUserExist = await UserModel.findOne({ email });
+    if (!isUserExist) {
+      return res.json({
+        success: false,
+        message: "User not found!",
+      });
+    }
 
-		// check the user already verify or not
-		if (isUserExist.isVerified) {
-			return res.json({
-				success: false,
-				message: "User already vefified",
-			});
-		}
+    // check the user already verify or not
+    if (isUserExist.isVerified) {
+      return res.json({
+        success: false,
+        message: "User already vefified",
+      });
+    }
 
-		const token = jwt.sign(
-			{ id: isUserExist._id, email: isUserExist.email },
-			process.env.JWT_SECRET,
-			{ expiresIn: "1d" },
-		);
-		// send verification email
-		sendEmail(email, isUserExist.email, token);
+    const token = jwt.sign(
+      { id: isUserExist._id, email: isUserExist.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+    // send verification email
+    sendEmail(email, isUserExist.email, token);
 
-		return res.json({
-			success: true,
-			message: "Resend varification email. please check your email",
-		});
-	} catch (error) {
-		return res.json({
-			success: false,
-			message: error.message,
-		});
-	}
+    return res.json({
+      success: true,
+      message: "Resend varification email. please check your email",
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
-	registrationController,
-	verifyController,
-	loginController,
-	forgotPasswordController,
-	setNewPasswordController,
-	revarificationController,
+  registrationController,
+  verifyController,
+  loginController,
+  forgotPasswordController,
+  setNewPasswordController,
+  revarificationController,
 };

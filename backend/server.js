@@ -11,9 +11,10 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-	res.json({
-		message: "Server is running successfully",
-	});
+  res.json({
+    message: "Server is running successfully",
+    variable: process.env.ACCESS_TOKEN,
+  });
 });
 
 app.use("/api/v1", authRoute);
@@ -23,5 +24,5 @@ dbConnect();
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-	console.log("Server is running at port: " + PORT);
+  console.log("Server is running at port: " + PORT);
 });
