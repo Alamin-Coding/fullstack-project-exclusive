@@ -114,9 +114,16 @@ const loginController = async (req, res) => {
   res.json({
     success: true,
     message: "Successfully Login",
-    accesstoken: token,
+    userInfo: {
+      id: isUserExist._id,
+      role: isUserExist.role,
+      accesstoken: token,
+      email: isUserExist.email
+    }
   });
 };
+
+
 const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
 

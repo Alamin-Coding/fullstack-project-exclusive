@@ -1,23 +1,52 @@
 import BreadCrumb from "../components/BreadCrumb";
 import Container from "../components/Container";
 import SignupImg from "../assets/signupimg.png";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import axios from "axios";
 import { useEffect } from "react";
+import { useState } from "react";
+import {useDispatch, useSelector} from "react-redux"
+import { login } from "../Slices/authSlice";
+
 
 const Login = () => {
-	useEffect(() => {
-		const getData = async () => {
-			try {
-				const response = await axios.get("http://localhost:5000");
-				console.log(response);
-			} catch (error) {
-				console.error(error);
-			}
-		};
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const {value} = useSelector((state)=> state.auth);
 
-		getData();
-	}, []);
+	console.log("Store value", value)
+
+
+
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	})
+	const [errorMessage, setErrorMessage] = useState("")
+
+	const handleChange = (e)=> {
+		const {name, value} = e.target;
+		
+		setFormData( (prev) =>  ({...prev, [name]: value}))
+	}
+
+	const handleLogin = async ()=> {
+		try {
+			const response = await axios.post(`${import.meta.env.VITE_AUTH_URL}/login`, {
+				email:formData.email, password:formData.password
+			})
+			console.log(response)
+			dispatch(login(response.data.userInfo))
+			if (!response.data.success) {
+				setErrorMessage(response.data.success)
+			}
+			navigate("/")
+			
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 
 	return (
 		<>
@@ -41,7 +70,10 @@ const Login = () => {
 
 						<div className="mt-10  ">
 							<input
+								name="email"
 								type="email"
+								value={formData.email}
+								onChange={handleChange}
 								placeholder="Email or Phone Number"
 								className="border-b-2 border-secondary w-92.5 h-8 py-2 focus:outline-none"
 							/>
@@ -49,16 +81,19 @@ const Login = () => {
 
 						<div className="mt-10 mb-10 ">
 							<input
+								name="password"
 								type="password"
+								value={formData.password}
+								onChange={handleChange}
 								placeholder="Password"
 								className="border-b-2 border-secondary w-92.5 h-8 py-2 focus:outline-none"
 							/>
 						</div>
 
 						<div className="flex gap-22 items-center">
-							<NavLink className="text-white px-12  py-4 bg-primary hover:bg-[#d60303] rounded-sm">
+							<button onClick={handleLogin} className="text-white px-12  py-4 bg-primary hover:bg-[#d60303] rounded-sm">
 								Log in
-							</NavLink>
+							</button>
 							<NavLink className="text-primary hover:border-b-1">
 								Forget Password?
 							</NavLink>

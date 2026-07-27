@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 
 
 const Navbar = () => {
+  const {user} = useSelector(state => state.auth)
   const [show, setShow] = useState(false);
   const handleClick = () => {
     setShow(!show)
@@ -72,9 +73,9 @@ const Navbar = () => {
                   <NavLink to="/about" className={navActive}>
                     <ListLi className="customize">about</ListLi>
                   </NavLink>
-                  <NavLink to="/signup" className={navActive}>
+                  {!user && <NavLink to="/signup" className={navActive}>
                     <ListLi className="customize">sign up</ListLi>
-                  </NavLink>
+                  </NavLink>}
                 </ListUl>
               </div>
 
