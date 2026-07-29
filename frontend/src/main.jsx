@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import { createBrowserRouter, RouterProvider } from "react-router";
-import RootLayout from "./RootLayout";
+import RootLayout from "./layout/RootLayout.jsx";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Shop from "./pages/Shop";
@@ -22,6 +22,10 @@ import { ToastContainer } from "react-toastify";
 import firebaseConfig from "../src/FirebaseConfig.js";
 import Emailvarification from "./pages/Emailvarification.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
+import Dashboard from "./dashboard/Dashboard.jsx";
+import DashboardLayout from "./layout/DashboardLayout.jsx";
+import CategoryForm from "./components/dashboard/CategoryForm.jsx";
+import ProductForm from "./components/dashboard/ProductForm.jsx";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +46,20 @@ const router = createBrowserRouter([
       { path: "checkout", Component: CheckOut },
       { path: "error", Component: Error },
       { path: "wishlist", Component: Wishlist },
+    ],
+  },
+  {
+    path: "/dashboard",
+    Component: DashboardLayout,
+    children: [
+      {
+        path: "",
+        Component: Dashboard,
+        children: [
+          { path: "category", Component: CategoryForm },
+          { path: "products", Component: ProductForm },
+        ],
+      },
     ],
   },
 ]);

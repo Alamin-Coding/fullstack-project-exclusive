@@ -9,12 +9,18 @@ import { IoCartOutline } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
 import { AiOutlineBars } from "react-icons/ai";
 import { NavLink, useNavigate } from "react-router";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { BiUser } from "react-icons/bi";
+import { logout } from "../Slices/authSlice";
 
 
 const Navbar = () => {
   const {user} = useSelector(state => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  
   const [show, setShow] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const handleClick = () => {
     setShow(!show)
   }
@@ -23,7 +29,6 @@ const Navbar = () => {
   // console.log(CartIcon);
   const wishlistIcon = useSelector((state) => state.allProduct.wishlist)
   // console.log(wishlistIcon);
-  const navigate = useNavigate();
 
 
   const navActive = ({ isActive }) =>
@@ -45,6 +50,12 @@ const Navbar = () => {
     } else {
       setFilteredProduct(products.filter((item) => item.title.toLowerCase().includes(value.toLowerCase())));
     }
+  }
+
+  const handleLogout = ()=> {
+    dispatch(logout())
+    navigate("/login")
+    setShowUserDropdown(false)
   }
 
   return (
@@ -120,6 +131,18 @@ const Navbar = () => {
                       <h2 className="absolute w-5 h-5 -top-3 left-3 rounded-full bg-primary text-white flex justify-center items-center text-xs">{CartIcon.length}</h2>
                     </div>
                   </NavLink>
+
+                  {user && <div className="p-1 relative">
+                    <button className="cursor-pointer" onClick={()=> setShowUserDropdown(!showUserDropdown)}><BiUser/></button>
+                    {showUserDropdown && <ul className="absolute top-10 right-0 z-10 p-2 bg-slate-300 space-y-2">
+                      <li>Profile</li>
+                      <li>Dashboard</li>
+                      <li>
+                        <button onClick={handleLogout} className="text-red-600 cursor-pointer">Logout</button>
+                      </li>
+
+                    </ul>}
+                  </div>}
                 </div>
                 
               </div>

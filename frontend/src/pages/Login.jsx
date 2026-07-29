@@ -7,9 +7,11 @@ import { useEffect } from "react";
 import { useState } from "react";
 import {useDispatch, useSelector} from "react-redux"
 import { login } from "../Slices/authSlice";
+import { toast } from "react-toastify";
 
 
 const Login = () => {
+	const notify = (message) => toast(message);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const {value} = useSelector((state)=> state.auth);
@@ -35,12 +37,17 @@ const Login = () => {
 			const response = await axios.post(`${import.meta.env.VITE_AUTH_URL}/login`, {
 				email:formData.email, password:formData.password
 			})
-			console.log(response)
 			dispatch(login(response.data.userInfo))
 			if (!response.data.success) {
-				setErrorMessage(response.data.success)
+				setErrorMessage(response.data.message)
+				console.log("1223")
+				notify(errorMessage)
+			}else{
+				navigate("/")
+				notify(response.data.message)
 			}
-			navigate("/")
+			
+
 			
 		} catch (error) {
 			console.log(error)
