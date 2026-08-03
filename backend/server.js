@@ -5,6 +5,7 @@ dotenv.config();
 const dbConnect = require("./config/db.config");
 const authRoute = require("./routes/authRoute");
 const productRoute = require("./routes/productRoute");
+const categoryRoute = require("./routes/categoryRoute");
 const cors = require("cors");
 
 app.use(express.json());
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", authRoute);
 app.use("/product", productRoute);
+app.use("/api/v1", categoryRoute);
 
 dbConnect();
 
