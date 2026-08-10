@@ -52,4 +52,47 @@ const getCategoryController = async (req, res) => {
 	});
 }
 
-module.exports = {createCategoryController, getCategoryController}
+const deleteCategoryController = async (req, res) => {
+	const {id} = req.params;
+
+
+	const category = await Category.findById(id)
+	if (!category) {
+		return res.json({
+			success: false,
+			message: "Category not found"
+		});
+	}
+
+	const deleteItem = await Category.findByIdAndDelete(id)
+
+	res.json({
+		success: true,
+		message: "Category Delete Successfully",
+		deleteItem: deleteItem
+	});
+}
+
+const editCategoryController = async (req, res) => {
+	const {id} = req.params;
+	const {categoryName} = req.body;
+
+
+	const category = await Category.findById(id)
+	if (!category) {
+		return res.json({
+			success: false,
+			message: "Category not found"
+		});
+	}
+
+	const editItem = await Category.findByIdAndUpdate(id, {categoryName:categoryName})
+
+	res.json({
+		success: true,
+		message: editItem.categoryName + " Category Edit Successfully",
+		deleteItem: editItem.categoryName
+	});
+}
+
+module.exports = {createCategoryController, getCategoryController, deleteCategoryController,editCategoryController}
