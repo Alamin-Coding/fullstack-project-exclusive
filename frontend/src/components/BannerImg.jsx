@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Container from './Container';
 import ListUl from './ListUl';
 import ListLi from './ListLi';
@@ -9,6 +9,7 @@ import Slider from "react-slick";
 import Image from './Image';
 import Banner from '../assets/Banner.jpg';
 import { BiCategory } from "react-icons/bi";
+import axios from "axios";
 
 
 const BannerImg = () => {
@@ -46,6 +47,24 @@ const BannerImg = () => {
     )
   };
 
+  
+  const [category, setCategory] = useState([]);
+
+    const getCategory = async ()=> {
+    try {
+      const response = await axios.get("http://localhost:5000/api/v1/category")
+      setCategory(response.data.category)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  console.log(category)
+
+    useEffect(()=> {
+    getCategory()
+  }, [])
+
   return (
     <Container>
       <div className="lg:flex">
@@ -57,15 +76,8 @@ const BannerImg = () => {
 
         <div className={`${show ? 'block' : 'hidden'} lg:flex w-[217px] sm:w-1/4 lg:border-r border-solid border-secondary`}>
           <ListUl className="lg:mt-6 mt-3 px-4 sm:px-0 sm:pr-4 lg:leading-9.5 font-poppins w-full">
-            <ListLi className="flex items-center justify-between">Woman’s Fashion <IoIosArrowForward /></ListLi>
-            <ListLi className="flex items-center justify-between">Men’s Fashion <IoIosArrowForward /></ListLi>
-            <ListLi>Electronics</ListLi>
-            <ListLi>Home & Lifestyle</ListLi>
-            <ListLi>Medicine</ListLi>
-            <ListLi>Sports & Outdoor</ListLi>
-            <ListLi>Baby’s & Toys</ListLi>
-            <ListLi>Groceries &</ListLi>
-            <ListLi>Health & Beauty</ListLi>
+           {category?.map((item)=> <ListLi key={item._id}>{item.categoryName}</ListLi>)}
+            
           </ListUl>
         </div>
         {/* category part start */}

@@ -1,4 +1,5 @@
-import React from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router'
 
 const navItemClass = ({ isActive }) =>
@@ -6,7 +7,30 @@ const navItemClass = ({ isActive }) =>
     isActive ? 'bg-[#DB4444] text-white' : 'text-slate-700 hover:bg-slate-100'
   }`
 
+  
+
+
+
+
+
 const Dashboard = () => {
+
+  const [category, setCategory] = useState([]);
+
+    const getCategory = async ()=> {
+    try {
+      const response = await axios.get("http://localhost:5000/api/v1/category")
+      setCategory(response.data.category)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  console.log(category)
+
+    useEffect(()=> {
+    getCategory()
+  }, [])
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -45,7 +69,7 @@ const Dashboard = () => {
                 12 Products
               </div>
               <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                5 Categories
+                {category.length} Categories
               </div>
             </div>
           </div>
