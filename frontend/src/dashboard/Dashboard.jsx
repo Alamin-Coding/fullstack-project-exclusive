@@ -44,7 +44,7 @@ const Dashboard = () => {
             Add Category
           </NavLink>
           <NavLink to="products" className={navItemClass}>
-            Add Product
+            Products
           </NavLink>
         </nav>
 

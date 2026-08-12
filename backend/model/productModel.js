@@ -14,6 +14,11 @@ const productSchema = new Schema({
 		trim: true,
 		required: true
 	},
+	category: {
+		type: String,
+		trim: true,
+		required: true
+	},
 	stock: {
 		type: Number,
 		trim: true,
@@ -39,9 +44,8 @@ const productSchema = new Schema({
 	
 	images: [
 		{
-			url: {type: String, required: true},
-			isMain: Boolean,
-			default: false
+			_id: false,
+			url: {type: String, required: true}
 		}
 	]
 }, {timestamps: true})
