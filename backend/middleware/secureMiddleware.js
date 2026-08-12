@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const secureMiddleware = async (req, res, next) => {
 	const token = req.headers.Authorization || req.headers.authorization;
 	if (!token) {
-		return res.json({
+		return res.status(401).json({
 			success: false,
 			message: "Token not found!",
 		});
@@ -10,13 +10,13 @@ const secureMiddleware = async (req, res, next) => {
 	const decode = jwt.decode(token, process.env.ACCESS_TOKEN);
 	console.log(decode);
 	if (!decode) {
-		return res.json({
+		return res.status(401).json({
 			success: false,
 			message: "Invalid Token",
 		});
 	}
 	if (decode.role !== "admin") {
-		return res.json({
+		return res.status(403).json({
 			success: false,
 			message: "You are not admin, please don't try",
 		});

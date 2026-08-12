@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     message: "Server is running successfully",
     variable: process.env.ACCESS_TOKEN,
   });

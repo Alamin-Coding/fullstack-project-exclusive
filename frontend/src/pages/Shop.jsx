@@ -20,11 +20,18 @@ const Shop = () => {
   const dispatch = useDispatch()
 
   async function getAllProducts() {
-    let data = await axios.get('https://dummyjson.com/products')
-    setProducts(data.data.products);
-
-    dispatch(productReducer(data.data.products))
-    setLoading(false);
+    try {
+      const data = await axios.get(`${import.meta.env.VITE_AUTH_URL}/product`)
+      const productList = data.data.products || []
+      setProducts(productList)
+      dispatch(productReducer(productList))
+    } catch (error) {
+      console.log(error)
+      setProducts([])
+      dispatch(productReducer([]))
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {

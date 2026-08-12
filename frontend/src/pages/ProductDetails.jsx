@@ -13,21 +13,32 @@ import { Rate } from 'antd';
 const ProductDetails = () => {
     const [products, setProducts] = useState({});
     const [productImages, setProductImages] = useState([]);
-    const [productReviews, setProductReviews] = useState([]);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [selectedSize, setSelectedSize] = useState("");
+    const [selectedColour, setSelectedColour] = useState("");
 
     const { id } = useParams();
-    async function getAllProducts() {
-        let data = await axios.get(`https://dummyjson.com/products/${id}`)
-        setProducts(data.data);
-        setProductImages(data.data.images);
-        setProductReviews(data.data.reviews);
 
-        // dispatch(productReducer(data.data.products))
-        // setLoading(false);
+    async function getProduct() {
+        try {
+            const { data } = await axios.get(`${import.meta.env.VITE_AUTH_URL}/product/${id}`)
+            const product = data.product || {}
+            const images = (product.images || []).map((img) => img.url).filter(Boolean)
+
+            setProducts(product);
+            setProductImages(images);
+            setSelectedImage(images[0] || "");
+            setSelectedSize(product.size?.[0] || "");
+            setSelectedColour(product.colours?.[0] || "");
+        } catch (error) {
+            console.log(error);
+            setProducts({});
+            setProductImages([]);
+        }
     }
-    useEffect(() => {
-        getAllProducts();
 
+    useEffect(() => {
+        getProduct();
     }, [id]);
 
     return (
@@ -40,10 +51,14 @@ const ProductDetails = () => {
                 <div className='flex gap-7.5'>
                     <div className='space-y-4'>
                         {
-                            productImages.map((images, id) => {
+                            productImages.map((image, index) => {
                                 return (
-                                    <div key={id} className='bg-[#f5f5f5] rounded-sm '>
-                                        <img className='w-42.5 h-34.5' src={images} alt="" />
+                                    <div
+                                        key={index}
+                                        onClick={() => setSelectedImage(image)}
+                                        className={`bg-[#f5f5f5] rounded-sm cursor-pointer ${selectedImage === image ? "ring-2 ring-primary" : ""}`}
+                                    >
+                                        <img className='w-42.5 h-34.5 object-cover' src={image} alt={products.title || "product"} />
                                     </div>
                                 );
                             })
@@ -51,7 +66,7 @@ const ProductDetails = () => {
                     </div>
 
                     <div className='bg-[#f5f5f5] flex justify-between items-center'>
-                        <img className='w-125 h-150' src={products.thumbnail} alt="" />
+                        <img className='w-125 h-150 object-contain' src={selectedImage} alt={products.title || "product"} />
                     </div>
 
                     <div className='w-99.75'>
@@ -61,16 +76,18 @@ const ProductDetails = () => {
 
                         <div className='mt-4 flex gap-6'>
                             <div className='flex gap-2 text-[#FFAD33]'>
-                                <Rate value={products.rating} />
+                                <Rate value={products.review || 0} />
                             </div>
                             <div>
                                 <h4 className='text-[#807b7b] font-Poppins text-sm'>
-                                    ( {productReviews.length} Reviews )
+                                    ( {products.review || 0} Reviews )
                                 </h4>
                             </div>
                             <div className='border-[#807b7b] border-r-2'></div>
                             <div>
-                                <h4 className='text-[#00FF66] font-Poppins text-sm'>In Stock</h4>
+                                <h4 className={`font-Poppins text-sm ${products.stock > 0 ? "text-[#00FF66]" : "text-primary"}`}>
+                                    {products.stock > 0 ? "In Stock" : "Out of Stock"}
+                                </h4>
                             </div>
                         </div>
 
@@ -79,32 +96,36 @@ const ProductDetails = () => {
                             <p className='text-sm font-poppins py-6'>{products.description}</p>
                         </div>
 
-                        <div className="flex items-center gap-4 py-6">
-                            <h2 className="text-[20px]">Colours:</h2>
-                            <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center">
-                                <div className="w-4 h-4 rounded-full bg-blue-300" />
+                        {products.colours?.length > 0 && (
+                            <div className="flex items-center gap-4 py-6">
+                                <h2 className="text-[20px]">Colours:</h2>
+                                {products.colours.map((colour) => (
+                                    <button
+                                        key={colour}
+                                        type="button"
+                                        onClick={() => setSelectedColour(colour)}
+                                        className={`w-6 h-6 rounded-full border-2 ${selectedColour === colour ? "border-black" : "border-transparent"} flex items-center justify-center`}
+                                        title={colour}
+                                    >
+                                        <span
+                                            className="w-4 h-4 rounded-full"
+                                            style={{ backgroundColor: colour }}
+                                        />
+                                    </button>
+                                ))}
                             </div>
-                            <div className="w-6 h-6 rounded-full bg-rose-500" />
-                        </div>
+                        )}
 
-                        <div className='flex gap-6 items-center'>
-                            <h2 className='text-xl font-inter'>Size:</h2>
-                            <Size
-                                heading='xs'
-                            />
-                            <Size
-                                heading='s'
-                            />
-                            <Size
-                                heading='m'
-                            />
-                            <Size
-                                heading='l'
-                            />
-                            <Size
-                                heading='xl'
-                            />
-                        </div>
+                        {products.size?.length > 0 && (
+                            <div className='flex gap-6 items-center flex-wrap'>
+                                <h2 className='text-xl font-inter'>Size:</h2>
+                                {products.size.map((size) => (
+                                    <div key={size} onClick={() => setSelectedSize(size)}>
+                                        <Size heading={size} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         <div className='flex mt-6 gap-4'>
                             <div className="flex items-center justify-between border border-gray-300 rounded-md overflow-hidden w-max text-lg font-medium">

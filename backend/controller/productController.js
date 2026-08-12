@@ -4,7 +4,7 @@ const addProductController = async (req, res) => {
 	const { title, price, review, description, stock, images, size, colours, category } = req.body;
 
 	if (!title || price === undefined || review === undefined || !description || stock === undefined || !images?.length || !size?.length || !colours?.length || !category) {
-		return res.json({
+		return res.status(400).json({
 			success: false,
 			message: "All Field are required",
 		});
@@ -13,7 +13,7 @@ const addProductController = async (req, res) => {
 	const product = await Product.findOne({ title });
 
 	if (product) {
-		return res.json({
+		return res.status(409).json({
 			success: false,
 			message: "This product already exist",
 		});
@@ -22,7 +22,7 @@ const addProductController = async (req, res) => {
 	const newProduct = new Product(req.body);
 	await newProduct.save();
 
-	res.json({
+	res.status(201).json({
 		success: true,
 		message: "Product created successfully",
 		data: newProduct,
@@ -32,7 +32,7 @@ const addProductController = async (req, res) => {
 const getProductsController = async (req, res) => {
 	const products = await Product.find().sort({ createdAt: -1 });
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: products.length ? "Products fetched successfully" : "No products found",
 		products,
@@ -44,13 +44,13 @@ const getProductByIdController = async (req, res) => {
 	const product = await Product.findById(id);
 
 	if (!product) {
-		return res.json({
+		return res.status(404).json({
 			success: false,
 			message: "Product not found",
 		});
 	}
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: "Product fetched successfully",
 		product,
@@ -64,7 +64,7 @@ const editProductController = async (req, res) => {
 	const product = await Product.findById(id);
 
 	if (!product) {
-		return res.json({
+		return res.status(404).json({
 			success: false,
 			message: "Product not found",
 		});
@@ -73,7 +73,7 @@ const editProductController = async (req, res) => {
 	const duplicate = await Product.findOne({ title, _id: { $ne: id } });
 
 	if (duplicate) {
-		return res.json({
+		return res.status(409).json({
 			success: false,
 			message: "Another product with this title already exists",
 		});
@@ -85,7 +85,7 @@ const editProductController = async (req, res) => {
 		{ new: true }
 	);
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: "Product updated successfully",
 		data: updatedProduct,
@@ -97,7 +97,7 @@ const deleteProductController = async (req, res) => {
 	const product = await Product.findById(id);
 
 	if (!product) {
-		return res.json({
+		return res.status(404).json({
 			success: false,
 			message: "Product not found",
 		});
@@ -105,7 +105,7 @@ const deleteProductController = async (req, res) => {
 
 	const deletedProduct = await Product.findByIdAndDelete(id);
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: "Product deleted successfully",
 		data: deletedProduct,

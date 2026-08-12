@@ -16,7 +16,7 @@ const registrationController = async (req, res) => {
   }
   const isUserExist = await UserModel.findOne({ email });
   if (isUserExist) {
-    return res.json({
+    return res.status(409).json({
       success: false,
       message: "User Already exist",
     });
@@ -40,7 +40,7 @@ const registrationController = async (req, res) => {
   // send verification email
   sendEmail(email, "alamin", token);
 
-  res.json({
+  res.status(201).json({
     success: true,
     message: "User registration successfull",
     data: {
@@ -56,7 +56,7 @@ const verifyController = async (req, res) => {
   jwt.verify(token, process.env.JWT_SECRET, async function (err, decoded) {
     // err
     if (err) {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "invalid token",
       });
@@ -69,18 +69,18 @@ const verifyController = async (req, res) => {
     console.log(hasUser);
 
     if (!hasUser) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
     hasUser.isVerified = true;
-    hasUser.save();
-  });
+    await hasUser.save();
 
-  res.json({
-    success: true,
-    message: "email varification successfull",
+    return res.status(200).json({
+      success: true,
+      message: "email varification successfull",
+    });
   });
 };
 const loginController = async (req, res) => {
@@ -89,7 +89,7 @@ const loginController = async (req, res) => {
   const isUserExist = await UserModel.findOne({ email });
 
   if (!isUserExist) {
-    return res.json({
+    return res.status(404).json({
       success: false,
       message: "User Not Found!",
     });
@@ -99,7 +99,7 @@ const loginController = async (req, res) => {
   const matchPassword = bcrypt.compareSync(password, isUserExist.password);
 
   if (!matchPassword) {
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "Credential error",
     });
@@ -111,7 +111,7 @@ const loginController = async (req, res) => {
     { expiresIn: "7d" },
   );
 
-  res.json({
+  res.status(200).json({
     success: true,
     message: "Successfully Login",
     userInfo: {
@@ -130,7 +130,7 @@ const forgotPasswordController = async (req, res) => {
   const isUserExist = await UserModel.findOne({ email });
 
   if (!isUserExist) {
-    return res.json({
+    return res.status(404).json({
       success: false,
       message: "User Not Found!",
     });
@@ -147,7 +147,7 @@ const forgotPasswordController = async (req, res) => {
 
     sendForgotEmail(email, "Al-amin", token);
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Check your email and set the new password",
     });
@@ -164,14 +164,14 @@ const setNewPasswordController = async (req, res) => {
   const { token } = req.params;
 
   if (newPassword !== confirmPassword) {
-    return res.status(401).json({
+    return res.status(400).json({
       success: false,
       message: "Passwords do not match",
     });
   }
 
   if (!token) {
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "Token Not Found!",
     });
@@ -188,7 +188,7 @@ const setNewPasswordController = async (req, res) => {
     user.password = hashpassword;
     await user.save();
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Successfully change the password",
     });
@@ -213,7 +213,7 @@ const revarificationController = async (req, res) => {
   try {
     const isUserExist = await UserModel.findOne({ email });
     if (!isUserExist) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "User not found!",
       });
@@ -221,7 +221,7 @@ const revarificationController = async (req, res) => {
 
     // check the user already verify or not
     if (isUserExist.isVerified) {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "User already vefified",
       });
@@ -235,12 +235,12 @@ const revarificationController = async (req, res) => {
     // send verification email
     sendEmail(email, isUserExist.email, token);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Resend varification email. please check your email",
     });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

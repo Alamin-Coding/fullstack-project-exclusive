@@ -3,7 +3,7 @@ const createCategoryController = async (req, res) => {
 	const { categoryName } = req.body;
 
     if (!categoryName.trim()) {
-       return res.json({
+       return res.status(400).json({
 		success: false,
 		message: "Category Name is Reqiured",
 		data: categoryName,
@@ -14,7 +14,7 @@ const createCategoryController = async (req, res) => {
 
 
 	if(isCategory) {
-		return res.json({
+		return res.status(409).json({
 		success: false,
 		message: "Category already exist"
 	});
@@ -24,7 +24,7 @@ const createCategoryController = async (req, res) => {
 	const newCategory = await Category.insertOne({categoryName})
 
 
-	res.json({
+	res.status(201).json({
 		success: true,
 		message: "Category created successfully",
 		data: categoryName,
@@ -38,14 +38,14 @@ const getCategoryController = async (req, res) => {
 
 
 	if(allCategory.length === 0) {
-		return res.json({
+		return res.status(200).json({
 		success: true,
 		message: "Category not found!",
 		category: allCategory,
 	});
 	}
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: "Category names",
 		category: allCategory,
@@ -58,7 +58,7 @@ const deleteCategoryController = async (req, res) => {
 
 	const category = await Category.findById(id)
 	if (!category) {
-		return res.json({
+		return res.status(404).json({
 			success: false,
 			message: "Category not found"
 		});
@@ -66,7 +66,7 @@ const deleteCategoryController = async (req, res) => {
 
 	const deleteItem = await Category.findByIdAndDelete(id)
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: "Category Delete Successfully",
 		deleteItem: deleteItem
@@ -80,7 +80,7 @@ const editCategoryController = async (req, res) => {
 
 	const category = await Category.findById(id)
 	if (!category) {
-		return res.json({
+		return res.status(404).json({
 			success: false,
 			message: "Category not found"
 		});
@@ -88,7 +88,7 @@ const editCategoryController = async (req, res) => {
 
 	const editItem = await Category.findByIdAndUpdate(id, {categoryName:categoryName})
 
-	res.json({
+	res.status(200).json({
 		success: true,
 		message: editItem.categoryName + " Category Edit Successfully",
 		deleteItem: editItem.categoryName

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import Card from './Card';
 import { useSelector } from 'react-redux';
@@ -7,39 +7,44 @@ const Pagination = ({ itemsPerPage }) => {
 
     const getAllProducts = useSelector((state) => state.allProduct.value)
 
-    const items = getAllProducts;
+    const items = getAllProducts || [];
 
     function Items({ currentItems }) {
         return (
             <>
                 <div className='flex flex-wrap justify-between gap-6'>
                     {currentItems &&
-                        currentItems.map((items, id) => (
+                        currentItems.map((item) => {
+                            const productId = item._id || item.id
+                            return (
                             <Card
-                                productDetails={items}
-                                id={items.id}
-                                key={id}
-                                img={items.thumbnail}
-                                heading={items.title}
-                                price={items.price}
-                                pastprice={Math.floor(items.price / (1 - items.discountPercentage / 100))}
-                                rating={items.rating}
-                                discount={items.discountPercentage}
-                                review={items.reviews[0].rating}
+                                productDetails={{ ...item, id: productId }}
+                                id={productId}
+                                key={productId}
+                                img={item.images?.[0]?.url || item.thumbnail}
+                                heading={item.title}
+                                price={item.price}
+                                pastprice={item.discountPercentage
+                                    ? Math.floor(item.price / (1 - item.discountPercentage / 100))
+                                    : undefined}
+                                rating={item.review ?? item.rating}
+                                discount={item.discountPercentage}
+                                reviews={item.review ?? item.reviews?.length}
                             />
-                        ))}
+                            )
+                        })}
                 </div>
             </>
         );
     }
 
     const [itemOffset, setItemOffset] = useState(0);
-    const endOffset = itemOffset + itemsPerPage;
+    const endOffset = itemOffset + Number(itemsPerPage);
     const currentItems = items.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(items.length / itemsPerPage);
+    const pageCount = Math.ceil(items.length / Number(itemsPerPage)) || 0;
 
     const handlePageClick = (event) => {
-        const newOffset = (event.selected * itemsPerPage) % items.length;
+        const newOffset = (event.selected * Number(itemsPerPage)) % items.length;
 
         setItemOffset(newOffset);
     };
