@@ -39,6 +39,32 @@ const getProductsController = async (req, res) => {
 	});
 };
 
+const getAllProductColoursController = async (req, res) => {
+	const colours = await Product.aggregate([
+		{ $unwind: "$colours" },
+		{
+			$project: {
+				colour: { $trim: { input: "$colours" } },
+			},
+		},
+		{ $match: { colour: { $ne: "" } } },
+		{
+			$group: {
+				_id: { $toLower: "$colour" },
+				colour: { $first: "$colour" }
+			},
+		},
+		{ $sort: { colour: -1 } },
+		{ $project: { _id: 1, colour: 1 } },
+	]);
+
+	res.status(200).json({
+		success: true,
+		message: colours.length ? "Colours fetched successfully" : "No colours found",
+		colours: colours.map((item) => item.colour),
+	});
+};
+
 const getProductByIdController = async (req, res) => {
 	const { id } = req.params;
 	const product = await Product.findById(id);
@@ -115,6 +141,7 @@ const deleteProductController = async (req, res) => {
 module.exports = {
 	addProductController,
 	getProductsController,
+	getAllProductColoursController,
 	getProductByIdController,
 	editProductController,
 	deleteProductController,

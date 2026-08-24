@@ -10,6 +10,7 @@ const Pagination = ({ itemsPerPage }) => {
     const items = getAllProducts || [];
 
     function Items({ currentItems }) {
+        console.log(currentItems)
         return (
             <>
                 <div className='flex flex-wrap justify-between gap-6'>
@@ -52,7 +53,8 @@ const Pagination = ({ itemsPerPage }) => {
     return (
         <>
             <Items currentItems={currentItems} />
-            <ReactPaginate
+            
+            {/* <ReactPaginate
                 breakLabel="..."
                 nextLabel=""
                 onPageChange={handlePageClick}
@@ -62,7 +64,7 @@ const Pagination = ({ itemsPerPage }) => {
                 renderOnZeroPageCount={null}
                 className='flex gap-2 mt-4'
                 pageClassName='px-6 py-0.5 text-white bg-black cursor-pointer'
-            />
+            /> */}
         </>
     )
 }
