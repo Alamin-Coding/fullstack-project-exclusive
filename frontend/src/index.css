@@ -30,6 +30,54 @@ body {
   display: none;
 }
 
+.banner-slider .slick-slider {
+  position: relative;
+}
+
+.banner-slider .slick-list {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.banner-slider-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.banner-slider-dots ul {
+  position: static;
+  transform: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.banner-slider-dots li {
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: transparent;
+}
+
+.banner-slider-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  background-color: #b3b3b3;
+  cursor: pointer;
+}
+
+.banner-slider-dots .slick-active .banner-slider-dot {
+  background-color: #DB4444;
+}
+
 .slick-dots li {
   width: 12px;
   height: 12px;

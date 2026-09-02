@@ -116,9 +116,11 @@ const loginController = async (req, res) => {
     message: "Successfully Login",
     userInfo: {
       id: isUserExist._id,
+      name: isUserExist.name,
       role: isUserExist.role,
       accesstoken: token,
-      email: isUserExist.email
+      email: isUserExist.email,
+      avatar: isUserExist.avatar || "",
     }
   });
 };

@@ -4,6 +4,7 @@ import SignupImg from "../assets/signupimg.png";
 import { FcGoogle } from "react-icons/fc";
 import { Navigate, NavLink, useNavigate } from "react-router";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 import axios from "axios";
 
@@ -31,8 +32,17 @@ const SignUp = () => {
 					password: formData.password
 				},
 			);
-			console.log(response);
+			toast(response.data.message);
+			if (response.data.success) {
+				Navigate("/login");
+			}
 		} catch (error) {
+			const message =
+				error.response?.data?.message ||
+				(error.code === "ERR_NETWORK"
+					? "Backend is not running. Start the server on port 5000."
+					: "Registration failed");
+			toast.error(message);
 			console.error(error);
 		}
 	};

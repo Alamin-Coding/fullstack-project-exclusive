@@ -7,51 +7,62 @@ const navItemClass = ({ isActive }) =>
     isActive ? 'bg-[#DB4444] text-white' : 'text-slate-700 hover:bg-slate-100'
   }`
 
-  
-
-
-
-
+const API_URL = import.meta.env.VITE_AUTH_URL
 
 const Dashboard = () => {
-
   const [category, setCategory] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [users, setUsers] = useState([]);
 
-    const getCategory = async ()=> {
+  const loadStats = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/category")
-      setCategory(response.data.category)
+      const [categoryRes, productRes, userRes] = await Promise.all([
+        axios.get(`${API_URL}/category`),
+        axios.get(`${API_URL}/product`),
+        axios.get(`${API_URL}/users`),
+      ])
+      setCategory(categoryRes.data.category || [])
+      setProducts(productRes.data.products || [])
+      setUsers(userRes.data.users || [])
     } catch (error) {
       console.log(error)
     }
   }
 
-  console.log(category)
-
-    useEffect(()=> {
-    getCategory()
+  useEffect(() => {
+    loadStats()
   }, [])
+
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         <div className="mb-6">
           <p className="text-sm uppercase tracking-[0.2em] text-[#DB4444]">Dashboard menu</p>
-          <h2 className="mt-3 text-xl font-semibold text-slate-900">Manage sections</h2>
+          <h2 className="mt-3 text-xl font-semibold text-slate-900">Manage store</h2>
         </div>
 
         <nav className="space-y-3">
-          <NavLink to="category" className={navItemClass}>
-            Add Category
+          <NavLink to="/dashboard" end className={navItemClass}>
+            Overview
           </NavLink>
           <NavLink to="products" className={navItemClass}>
             Products
           </NavLink>
+          <NavLink to="category" className={navItemClass}>
+            Categories
+          </NavLink>
+          <NavLink to="content" className={navItemClass}>
+            Storefront UI
+          </NavLink>
+          <NavLink to="users" className={navItemClass}>
+            Users
+          </NavLink>
         </nav>
 
         <div className="mt-8 rounded-3xl bg-slate-50 p-5 text-sm text-slate-600">
-          <p className="font-semibold text-slate-900">Quick overview</p>
+          <p className="font-semibold text-slate-900">Exclusive admin</p>
           <p className="mt-2 leading-6">
-            Use the links above to switch between product creation and category management sections.
+            Change homepage banners, flash sales, about, contact, and footer to match the storefront design.
           </p>
         </div>
       </aside>
@@ -64,12 +75,15 @@ const Dashboard = () => {
               <h2 className="mt-2 text-2xl font-semibold text-slate-900">Dashboard overview</h2>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                12 Products
+                {products.length} Products
               </div>
               <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 {category.length} Categories
+              </div>
+              <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                {users.length} Users
               </div>
             </div>
           </div>

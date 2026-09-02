@@ -3,8 +3,8 @@ import { countDownDateAndTime } from 'countdown-date-time';
 import Flex from './Flex';
 
 
-const JblCounter = ({ className }) => {
-  const conduct_date = '2025-09-30 23:54:00';
+const JblCounter = ({ className, endDate }) => {
+  const conduct_date = endDate || '2026-12-31 23:59:00';
   const [count, setCount] = useState({});
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const JblCounter = ({ className }) => {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [conduct_date]);
 
   return (
     <>

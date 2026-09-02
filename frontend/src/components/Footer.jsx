@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Container from './Container';
 import Flex from './Flex';
 import { VscSend } from "react-icons/vsc";
@@ -10,10 +11,24 @@ import { FaInstagram } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa";
 import { FaRegCopyright } from "react-icons/fa6";
 import SocialIcon from './SocialIcon';
-
-
+import axios from 'axios';
 
 const Footer = () => {
+    const [footer, setFooter] = useState({
+        brand: 'Exclusive',
+        subscribeText: 'Get 10% off your first order',
+        address: '111 Bijoy sarani, Dhaka,  DH 1515, Bangladesh.',
+        email: 'exclusive@gamil.com',
+        phone: '+88015-88888-9999',
+        copyright: 'Copyright Rimel 2022. All right reserved',
+    })
+
+    useEffect(() => {
+        axios.get(`${import.meta.env.VITE_AUTH_URL}/site`).then(({ data }) => {
+            if (data.site?.footer) setFooter((prev) => ({ ...prev, ...data.site.footer }))
+        }).catch(console.log)
+    }, [])
+
     return (
         <>
             <footer className='bg-black lg:mt-25 mt-15'>
@@ -21,9 +36,9 @@ const Footer = () => {
                     <Flex className='text-white grid grid-cols-1 lg:flex lg:py-20 lg:gap-21.75 py-10 gap-8'>
 
                         <div className='lg:mx-0 mx-auto lg:text-start text-center'>
-                            <h2 className='text-2xl font-bold font-inter'>Exclusive</h2>
+                            <h2 className='text-2xl font-bold font-inter'>{footer.brand}</h2>
                             <h2 className='text-xl font-medium font-poppins lg:py-6 py-2'>Subscribe</h2>
-                            <p className='font-poppins lg:pb-4 pb-1'>Get 10% off your first order</p>
+                            <p className='font-poppins lg:pb-4 pb-1'>{footer.subscribeText}</p>
                             <input
                                 type='text'
                                 className="lg:w-40 w-70 bg-transparent text-[#FAFAFA] mt-3.5 lg:mt-0 text-xs py-2.5 pl-5 pr-3 border-1 rounded-full lg:rounded-sm"
@@ -36,9 +51,9 @@ const Footer = () => {
 
                         <div className='font-poppins w-43.75 lg:mx-0 mx-auto lg:text-start text-center'>
                             <h2 className='text-xl font-medium'>Support</h2>
-                            <p className='lg:pt-6 lg:pb-4 pt-2 pb-1'>111 Bijoy sarani, Dhaka,  DH 1515, Bangladesh.</p>
-                            <h2 className='lg:pb-4 pb-1'>exclusive@gamil.com</h2>
-                            <h2>+88015-88888-9999</h2>
+                            <p className='lg:pt-6 lg:pb-4 pt-2 pb-1'>{footer.address}</p>
+                            <h2 className='lg:pb-4 pb-1'>{footer.email}</h2>
+                            <h2>{footer.phone}</h2>
                         </div>
 
 
@@ -75,7 +90,7 @@ const Footer = () => {
                 <div className='border-[#353434b3] border-b-2 w-full pb-4'></div>
                 <div className='flex justify-center items-center text-[#353434b3] gap-1'>
                     <FaRegCopyright />
-                    <h2 className='text-[#353434b3] text-center py-4'> Copyright Rimel 2022. All right reserved</h2>
+                    <h2 className='text-[#353434b3] text-center py-4'> {footer.copyright}</h2>
                 </div>
             </footer>
         </>

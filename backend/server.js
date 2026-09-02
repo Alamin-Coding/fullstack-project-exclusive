@@ -6,6 +6,8 @@ const dbConnect = require("./config/db.config");
 const authRoute = require("./routes/authRoute");
 const productRoute = require("./routes/productRoute");
 const categoryRoute = require("./routes/categoryRoute");
+const siteRoute = require("./routes/siteRoute");
+const profileRoute = require("./routes/profileRoute");
 const cors = require("cors");
 
 app.use(express.json());
@@ -21,6 +23,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1", authRoute);
 app.use("/api/v1", productRoute);
 app.use("/api/v1", categoryRoute);
+app.use("/api/v1", siteRoute);
+app.use("/api/v1", profileRoute);
 
 dbConnect();
 

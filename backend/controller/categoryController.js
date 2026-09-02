@@ -2,7 +2,7 @@ const Category = require("../model/categoryModel")
 const createCategoryController = async (req, res) => {
 	const { categoryName } = req.body;
 
-    if (!categoryName.trim()) {
+    if (!categoryName?.trim()) {
        return res.status(400).json({
 		success: false,
 		message: "Category Name is Reqiured",
@@ -86,7 +86,7 @@ const editCategoryController = async (req, res) => {
 		});
 	}
 
-	const editItem = await Category.findByIdAndUpdate(id, {categoryName:categoryName})
+	const editItem = await Category.findByIdAndUpdate(id, {categoryName:categoryName}, { new: true })
 
 	res.status(200).json({
 		success: true,

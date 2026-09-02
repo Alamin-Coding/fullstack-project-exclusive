@@ -1,12 +1,28 @@
+import { useEffect, useState } from "react";
 import Container from "../components/Container";
 import BreadCrumb from "../components/BreadCrumb";
 import { IoCallOutline } from "react-icons/io5";
 import { SlEnvolopeLetter } from "react-icons/sl";
 import Button from "../components/Button";
-
-
+import axios from "axios";
 
 const Contact = () => {
+  const [contact, setContact] = useState({
+    phoneLabel: "Call To Us",
+    phoneText: "We are available 24/7, 7 days a week.",
+    phone: "+8801611112222",
+    emailLabel: "Write To US",
+    emailText: "Fill out our form and we will contact you within 24 hours.",
+    email1: "customer@exclusive.com",
+    email2: "support@exclusive.com",
+  })
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_AUTH_URL}/site`).then(({ data }) => {
+      if (data.site?.contact) setContact((prev) => ({ ...prev, ...data.site.contact }))
+    }).catch(console.log)
+  }, [])
+
   return (
     <>
       <Container>
@@ -19,21 +35,21 @@ const Contact = () => {
               <div className="text-white p-2.5 bg-primary rounded-full flex justify-center items-center">
                 <IoCallOutline />
               </div>
-              <h2>Call To Us</h2>
+              <h2>{contact.phoneLabel}</h2>
             </span>
-            <p className="py-4 text-sm">We are available 24/7, 7 days a week.</p>
-            <h2 className="text-sm">Phone: +8801611112222</h2>
+            <p className="py-4 text-sm">{contact.phoneText}</p>
+            <h2 className="text-sm">Phone: {contact.phone}</h2>
             <div className="border-b-2 border-secondary my-8"></div>
 
             <span className="flex items-center gap-3 text-2xl font-medium mb-6">
               <div className="text-white p-2.5 bg-primary rounded-full flex justify-center items-center">
                 <SlEnvolopeLetter />
               </div>
-              <h2>Write To US</h2>
+              <h2>{contact.emailLabel}</h2>
             </span>
-            <p className="py-4 text-sm">Fill out our form and we will contact you within 24 hours.</p>
-            <h2 className="pb-4 text-sm">Emails: customer@exclusive.com</h2>
-            <h2 className="text-sm">Emails: support@exclusive.com</h2>
+            <p className="py-4 text-sm">{contact.emailText}</p>
+            <h2 className="pb-4 text-sm">Emails: {contact.email1}</h2>
+            <h2 className="text-sm">Emails: {contact.email2}</h2>
           </div>
 
           <div className="shadow px-7.75 py-10 lg:w-200 w-85 mx-auto rounded-sm">

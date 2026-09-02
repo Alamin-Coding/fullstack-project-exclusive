@@ -5,8 +5,8 @@ import Image from './Image';
 import Semiclone from '../assets/Semiclone.png'
 
 
-const Counter = ({ className }) => {
-    const conduct_date = '2025-09-30 23:54:00';
+const Counter = ({ className, endDate }) => {
+    const conduct_date = endDate || '2026-12-31 23:59:00';
     const [count, setCount] = useState({});
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const Counter = ({ className }) => {
         updateCountdown();
         const interval = setInterval(updateCountdown, 1000);
         return () => clearInterval(interval);
-    }, []);
+    }, [conduct_date]);
 
     return (
         <>

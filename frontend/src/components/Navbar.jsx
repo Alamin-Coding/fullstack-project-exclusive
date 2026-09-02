@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Container from "./Container";
 import Flex from "./Flex";
 import Logo from '../assets/Logo.png'
@@ -10,8 +10,10 @@ import { CiSearch } from "react-icons/ci";
 import { AiOutlineBars } from "react-icons/ai";
 import { NavLink, useNavigate } from "react-router";
 import { useSelector, useDispatch } from 'react-redux';
-import { BiUser } from "react-icons/bi";
-import { logout } from "../Slices/authSlice";
+import { logout, updateUser } from "../Slices/authSlice";
+import { productReducer } from "../Slices/ProductSlices";
+import axios from "axios";
+import UserAvatar from "./UserAvatar";
 
 
 const Navbar = () => {
@@ -37,7 +39,31 @@ const Navbar = () => {
       : "lg:text-[#000000] hover:text-[#DB4444]";
 
 
-  const products = useSelector((state) => state.allProduct.value)
+  const products = useSelector((state) => state.allProduct.value) || []
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_AUTH_URL}/product`)
+      .then(({ data }) => dispatch(productReducer(data.products || [])))
+      .catch(console.log)
+  }, [dispatch])
+
+  useEffect(() => {
+    if (!user?.id || user?.avatar) return;
+
+    axios
+      .get(`${import.meta.env.VITE_AUTH_URL}/profile/${user.id}`, {
+        headers: { Authorization: user.accesstoken },
+      })
+      .then(({ data }) => {
+        if (data.profile) {
+          dispatch(updateUser({
+            name: data.profile.name,
+            avatar: data.profile.avatar || "",
+          }));
+        }
+      })
+      .catch(console.log);
+  }, [user?.id, user?.avatar, user?.accesstoken, dispatch]);
   // console.log(products);
   const [search, setSearch] = useState('');
   const [filteredProduct, setFilteredProduct] = useState([]);
@@ -48,7 +74,7 @@ const Navbar = () => {
     if (value.trim() === "") {
       setFilteredProduct([]);
     } else {
-      setFilteredProduct(products.filter((item) => item.title.toLowerCase().includes(value.toLowerCase())));
+      setFilteredProduct(products.filter((item) => item.title?.toLowerCase().includes(value.toLowerCase())));
     }
   }
 
@@ -105,12 +131,12 @@ const Navbar = () => {
                     {filteredProduct.map((item) => (
                       <div className='flex gap-3 items-center border-b-2 border-gray-200'
                         onClick={() => {
-                          navigate(`/productDetails/${item.id}`);
+                          navigate(`/productdetails/${item._id || item.id}`);
                           setSearch('')
                           setFilteredProduct([])
                         }}
                       >
-                        <img src={item.thumbnail} alt="" className="w-10 h-10" />
+                        <img src={item.images?.[0]?.url || item.thumbnail} alt="" className="w-10 h-10" />
                         {item.title}
                       </div>
                     ))}
@@ -133,10 +159,18 @@ const Navbar = () => {
                   </NavLink>
 
                   {user && <div className="p-1 relative">
-                    <button className="cursor-pointer" onClick={()=> setShowUserDropdown(!showUserDropdown)}><BiUser/></button>
-                    {showUserDropdown && <ul className="absolute top-10 right-0 z-10 p-2 bg-slate-300 space-y-2">
-                      <li>Profile</li>
-                      <li>Dashboard</li>
+                    <button type="button" className="cursor-pointer" onClick={()=> setShowUserDropdown(!showUserDropdown)}>
+                      <UserAvatar src={user.avatar} name={user.name || user.email} size="sm" />
+                    </button>
+                    {showUserDropdown && <ul className="absolute top-10 right-0 z-10 p-2 bg-slate-300 space-y-2 min-w-36">
+                      <li>
+                        <NavLink to="/profile" onClick={() => setShowUserDropdown(false)}>Profile</NavLink>
+                      </li>
+                      {user?.role === "admin" && (
+                        <li>
+                          <NavLink to="/dashboard" onClick={() => setShowUserDropdown(false)}>Dashboard</NavLink>
+                        </li>
+                      )}
                       <li>
                         <button onClick={handleLogout} className="text-red-600 cursor-pointer">Logout</button>
                       </li>

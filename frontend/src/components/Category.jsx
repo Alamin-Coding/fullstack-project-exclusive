@@ -1,17 +1,14 @@
+import { useEffect, useState } from 'react';
 import SecHead from './SecHead';
 import Container from './Container';
 import ThirdHead from './ThirdHead';
-import { IoIosPhonePortrait } from "react-icons/io";
-import { HiOutlineComputerDesktop } from "react-icons/hi2";
-import { BsSmartwatch } from "react-icons/bs";
-import { CiCamera } from "react-icons/ci";
-import { PiHeadphones } from "react-icons/pi";
-import { LuGamepad } from "react-icons/lu";
+import { BiCategory } from "react-icons/bi";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
+import axios from 'axios';
 
 function SampleNextArrow(props) {
     const { onClick } = props;
@@ -38,42 +35,30 @@ function SamplePrevArrow(props) {
 }
 
 const Category = () => {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        axios.get(`${import.meta.env.VITE_AUTH_URL}/category`)
+            .then(({ data }) => setCategories(data.category || []))
+            .catch(console.log)
+    }, [])
+
     const settings = {
         dots: false,
-        infinite: true,
+        infinite: categories.length > 6,
         speed: 500,
-        slidesToShow: 6,
-        slidesToScroll: 6,
+        slidesToShow: Math.min(6, Math.max(categories.length, 1)),
+        slidesToScroll: 1,
         initialSlide: 0,
         nextArrow: <SampleNextArrow />,
         prevArrow: <SamplePrevArrow />,
         responsive: [
-            {
-                breakpoint: 990,
-                settings: {
-                    slidesToShow: 6,
-                    slidesToScroll: 6,
-                    infinite: true,
-                    dots: false
-                }
-            },
-            {
-                breakpoint: 776,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    initialSlide: 2
-                }
-            },
-            {
-                breakpoint: 570,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2
-                }
-            }
+            { breakpoint: 990, settings: { slidesToShow: Math.min(6, Math.max(categories.length, 1)), slidesToScroll: 1 } },
+            { breakpoint: 776, settings: { slidesToShow: Math.min(2, Math.max(categories.length, 1)), slidesToScroll: 1 } },
+            { breakpoint: 570, settings: { slidesToShow: Math.min(2, Math.max(categories.length, 1)), slidesToScroll: 1 } }
         ]
     };
+
     return (
         <>
             <Container>
@@ -85,30 +70,13 @@ const Category = () => {
                 </div>
 
                 <Slider {...settings}>
-                    <ThirdHead
-                        items={<IoIosPhonePortrait />}
-                        heading='Phones'
-                    />
-                    <ThirdHead
-                        items={<HiOutlineComputerDesktop />}
-                        heading='Computers'
-                    />
-                    <ThirdHead
-                        items={<BsSmartwatch />}
-                        heading='Smart Watch'
-                    />
-                    <ThirdHead
-                        items={<CiCamera />}
-                        heading='Camera'
-                    />
-                    <ThirdHead
-                        items={<PiHeadphones />}
-                        heading='Headphones'
-                    />
-                    <ThirdHead
-                        items={<LuGamepad />}
-                        heading='Gaming'
-                    />
+                    {categories.map((item) => (
+                        <ThirdHead
+                            key={item._id}
+                            items={<BiCategory />}
+                            heading={item.categoryName}
+                        />
+                    ))}
                 </Slider>
             </Container>
         </>
@@ -116,4 +84,3 @@ const Category = () => {
 }
 
 export default Category;
-

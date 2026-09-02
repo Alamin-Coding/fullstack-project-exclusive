@@ -85,7 +85,7 @@ const getProductByIdController = async (req, res) => {
 
 const editProductController = async (req, res) => {
 	const { id } = req.params;
-	const { title, price, review, description, stock, images, size, colours, category } = req.body;
+	const { title, price, review, description, stock, images, size, colours, category, discountPercentage, isFlashSale, isBestSelling, isNewArrival } = req.body;
 
 	const product = await Product.findById(id);
 
@@ -107,7 +107,7 @@ const editProductController = async (req, res) => {
 
 	const updatedProduct = await Product.findByIdAndUpdate(
 		id,
-		{ title, price, review, description, stock, images, size, colours, category },
+		{ title, price, review, description, stock, images, size, colours, category, discountPercentage, isFlashSale, isBestSelling, isNewArrival },
 		{ new: true }
 	);
 

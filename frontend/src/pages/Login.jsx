@@ -40,16 +40,21 @@ const Login = () => {
 			dispatch(login(response.data.userInfo))
 			if (!response.data.success) {
 				setErrorMessage(response.data.message)
-				console.log("1223")
-				notify(errorMessage)
-			}else{
-				navigate("/")
 				notify(response.data.message)
+			}else{
+				notify(response.data.message)
+				navigate(response.data.userInfo?.role === "admin" ? "/dashboard" : "/")
 			}
 			
 
 			
 		} catch (error) {
+			const message =
+				error.response?.data?.message ||
+				(error.code === "ERR_NETWORK"
+					? "Backend is not running. Start the server on port 5000."
+					: "Login failed");
+			notify(message)
 			console.log(error)
 		}
 	}

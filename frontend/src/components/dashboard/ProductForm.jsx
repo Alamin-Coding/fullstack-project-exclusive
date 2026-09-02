@@ -12,6 +12,10 @@ const emptyForm = {
   price: "",
   stock: "",
   review: "",
+  discountPercentage: "",
+  isFlashSale: false,
+  isBestSelling: false,
+  isNewArrival: false,
   colours: [""],
   size: [""],
   images: [{ url: "" }],
@@ -93,6 +97,10 @@ const ProductForm = () => {
       price: product.price ?? "",
       stock: product.stock ?? "",
       review: product.review ?? "",
+      discountPercentage: product.discountPercentage ?? "",
+      isFlashSale: Boolean(product.isFlashSale),
+      isBestSelling: Boolean(product.isBestSelling),
+      isNewArrival: Boolean(product.isNewArrival),
       colours: product.colours?.length ? product.colours : [""],
       size: product.size?.length ? product.size : [""],
       images: product.images?.length ? product.images : [{ url: "" }],
@@ -170,6 +178,10 @@ const ProductForm = () => {
     price: Number(values.price),
     stock: Number(values.stock),
     review: Number(values.review),
+    discountPercentage: Number(values.discountPercentage || 0),
+    isFlashSale: Boolean(values.isFlashSale),
+    isBestSelling: Boolean(values.isBestSelling),
+    isNewArrival: Boolean(values.isNewArrival),
     colours: values.colours.map((c) => c.trim()).filter(Boolean),
     size: values.size.map((s) => s.trim()).filter(Boolean),
     images: values.images.map((img) => ({ url: img.url.trim() })).filter((img) => img.url),
@@ -245,6 +257,7 @@ const ProductForm = () => {
               <th className="px-4 py-4 font-semibold">Price</th>
               <th className="px-4 py-4 font-semibold">Stock</th>
               <th className="px-4 py-4 font-semibold">Review</th>
+              <th className="px-4 py-4 font-semibold">Home</th>
               <th className="px-4 py-4 font-semibold">Colours</th>
               <th className="px-4 py-4 font-semibold">Size</th>
               <th className="px-4 py-4 font-semibold text-right">Actions</th>
@@ -253,13 +266,13 @@ const ProductForm = () => {
           <tbody className="divide-y divide-slate-200 bg-white">
             {loading ? (
               <tr>
-                <td colSpan="9" className="px-4 py-10 text-center text-slate-500">
-                  Loading products...
+                <td colSpan="10" className="px-4 py-10 text-center text-slate-500">
+                    Loading products...
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan="9" className="px-4 py-10 text-center text-slate-500">
+                <td colSpan="10" className="px-4 py-10 text-center text-slate-500">
                   No products found. Click &quot;Add Product&quot; to create one.
                 </td>
               </tr>
@@ -286,6 +299,9 @@ const ProductForm = () => {
                   <td className="px-4 py-4 font-medium text-slate-900">${product.price}</td>
                   <td className="px-4 py-4 text-slate-600">{product.stock}</td>
                   <td className="px-4 py-4 text-slate-600">{product.review}</td>
+                  <td className="px-4 py-4 text-xs text-slate-600">
+                    {[product.isFlashSale && "Flash", product.isBestSelling && "Best", product.isNewArrival && "New"].filter(Boolean).join(", ") || "-"}
+                  </td>
                   <td className="max-w-[120px] truncate px-4 py-4 text-slate-600">
                     {product.colours?.join(", ") || "-"}
                   </td>
@@ -416,6 +432,36 @@ const ProductForm = () => {
                   required
                 />
               </label>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="block text-sm font-medium text-slate-700">Discount %</span>
+                <input
+                  type="number"
+                  name="discountPercentage"
+                  value={values.discountPercentage}
+                  onChange={handleChange}
+                  placeholder="40"
+                  min="0"
+                  max="100"
+                  className={inputClass}
+                />
+              </label>
+              <div className="flex flex-wrap items-center gap-4 pt-7 text-sm">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={values.isFlashSale} onChange={(e) => setValues((prev) => ({ ...prev, isFlashSale: e.target.checked }))} />
+                  Flash Sale
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={values.isBestSelling} onChange={(e) => setValues((prev) => ({ ...prev, isBestSelling: e.target.checked }))} />
+                  Best Selling
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={values.isNewArrival} onChange={(e) => setValues((prev) => ({ ...prev, isNewArrival: e.target.checked }))} />
+                  Our Products / New
+                </label>
+              </div>
             </div>
 
             <div className="space-y-3">

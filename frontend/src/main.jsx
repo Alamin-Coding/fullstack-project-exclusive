@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { store } from "./Store";
 import AtToCart from "./pages/AtToCart";
 import Account from "./pages/Account";
+import Profile from "./pages/Profile";
 import CheckOut from "./pages/CheckOut";
 import Error from "./pages/Error";
 import Wishlist from "./pages/Wishlist";
@@ -26,6 +27,9 @@ import Dashboard from "./dashboard/Dashboard.jsx";
 import DashboardLayout from "./layout/DashboardLayout.jsx";
 import CategoryForm from "./components/dashboard/CategoryForm.jsx";
 import ProductForm from "./components/dashboard/ProductForm.jsx";
+import Overview from "./dashboard/Overview.jsx";
+import UsersPanel from "./dashboard/UsersPanel.jsx";
+import SiteContent from "./dashboard/SiteContent.jsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +47,7 @@ const router = createBrowserRouter([
       { path: "productdetails/:id", Component: ProductDetails },
       { path: "attocart", Component: AtToCart },
       { path: "account", Component: Account },
+      { path: "profile", Component: Profile },
       { path: "checkout", Component: CheckOut },
       { path: "error", Component: Error },
       { path: "wishlist", Component: Wishlist },
@@ -56,8 +61,11 @@ const router = createBrowserRouter([
         path: "",
         Component: Dashboard,
         children: [
+          { index: true, Component: Overview },
           { path: "category", Component: CategoryForm },
           { path: "products", Component: ProductForm },
+          { path: "users", Component: UsersPanel },
+          { path: "content", Component: SiteContent },
         ],
       },
     ],

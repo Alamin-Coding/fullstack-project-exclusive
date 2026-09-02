@@ -47,7 +47,23 @@ const productSchema = new Schema({
 			_id: false,
 			url: {type: String, required: true}
 		}
-	]
+	],
+	discountPercentage: {
+		type: Number,
+		default: 0
+	},
+	isFlashSale: {
+		type: Boolean,
+		default: false
+	},
+	isBestSelling: {
+		type: Boolean,
+		default: false
+	},
+	isNewArrival: {
+		type: Boolean,
+		default: false
+	}
 }, {timestamps: true})
 
 // const User = Model("User", userSchema);
